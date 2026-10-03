@@ -67,7 +67,7 @@ func TestOpenPickerReturnsRunnerError(t *testing.T) {
 	}
 }
 
-func TestSendTextPreservesExactArgumentWithoutSubmitting(t *testing.T) {
+func TestInsertPromptPreservesExactArgumentAndSubmitsByDefault(t *testing.T) {
 	var gotName string
 	var gotArgs, gotEnv []string
 	client := Client{
@@ -81,35 +81,48 @@ func TestSendTextPreservesExactArgumentWithoutSubmitting(t *testing.T) {
 	}
 
 	text := "first line\nsecond line  \n$HOME; $(not-a-command) & 'quoted'\t "
-	if err := client.SendText("pane; $(not-a-command)", text); err != nil {
-		t.Fatalf("SendText() error = %v", err)
+	if err := client.InsertPrompt("pane; $(not-a-command)", text); err != nil {
+		t.Fatalf("InsertPrompt() error = %v", err)
 	}
 	if gotName != client.Binary {
 		t.Errorf("command name = %q, want %q", gotName, client.Binary)
 	}
-	wantArgs := []string{"pane", "send-text", "pane; $(not-a-command)", text}
+	wantArgs := []string{"agent", "prompt", "pane; $(not-a-command)", text}
 	if !reflect.DeepEqual(gotArgs, wantArgs) {
 		t.Errorf("arguments = %#v, want %#v", gotArgs, wantArgs)
 	}
 	if gotEnv != nil {
 		t.Errorf("runner environment = %#v, want nil", gotEnv)
 	}
-	for _, argument := range gotArgs {
-		if argument == "send-keys" || argument == "enter" {
-			t.Errorf("unexpected submitting command argument %q", argument)
-		}
+}
+
+func TestInsertPromptCanUseConfiguredSendTextCommand(t *testing.T) {
+	var gotArgs []string
+	client := Client{
+		InsertCommand: SendText,
+		Run: func(_ string, args []string, _ []string) error {
+			gotArgs = args
+			return nil
+		},
+	}
+	if err := client.InsertPrompt("pane-1", "text"); err != nil {
+		t.Fatalf("InsertPrompt() error = %v", err)
+	}
+	wantArgs := []string{"pane", "send-text", "pane-1", "text"}
+	if !reflect.DeepEqual(gotArgs, wantArgs) {
+		t.Errorf("arguments = %#v, want %#v", gotArgs, wantArgs)
 	}
 }
 
-func TestSendTextUsesDefaultBinaryAndReturnsRunnerError(t *testing.T) {
+func TestInsertPromptUsesDefaultBinaryAndReturnsRunnerError(t *testing.T) {
 	want := errors.New("permission denied")
 	var gotName string
 	client := Client{Run: func(name string, _ []string, _ []string) error {
 		gotName = name
 		return want
 	}}
-	if err := client.SendText("pane-1", "text"); !errors.Is(err, want) {
-		t.Errorf("SendText() error = %v, want wrapped %v", err, want)
+	if err := client.InsertPrompt("pane-1", "text"); !errors.Is(err, want) {
+		t.Errorf("InsertPrompt() error = %v, want wrapped %v", err, want)
 	}
 	if gotName != DefaultBinary {
 		t.Errorf("command name = %q, want default %q", gotName, DefaultBinary)

@@ -48,7 +48,7 @@ func TestPickerModelInsertsExactPromptIntoCapturedPane(t *testing.T) {
 	if gotName != "/tmp/herdr" {
 		t.Errorf("binary = %q, want configured binary", gotName)
 	}
-	wantArgs := []string{"pane", "send-text", "pane-at-open", contents}
+	wantArgs := []string{"agent", "prompt", "pane-at-open", contents}
 	if !reflect.DeepEqual(gotArgs, wantArgs) {
 		t.Errorf("arguments = %#v, want %#v", gotArgs, wantArgs)
 	}

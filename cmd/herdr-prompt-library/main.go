@@ -28,7 +28,10 @@ func command(args []string) error {
 			Binary: os.Getenv("HERDR_BIN_PATH"),
 		})
 	case "picker":
-		return picker(os.Getenv, config.Load, config.ConfiguredLibraries, herdr.Client{Binary: os.Getenv("HERDR_BIN_PATH")})
+		return picker(os.Getenv, config.Load, config.ConfiguredLibraries, herdr.Client{
+			Binary:        os.Getenv("HERDR_BIN_PATH"),
+			InsertCommand: os.Getenv(herdr.InsertCommandEnv),
+		})
 	default:
 		return fmt.Errorf("unknown command %q: %w", args[0], errUsage)
 	}
@@ -64,7 +67,7 @@ func pickerModel(getenv func(string) string, load func() ([]config.Prompt, error
 		Now: time.Now,
 	}
 	return ui.NewWithInsertionAndLibraries(prompts, func(prompt config.Prompt) error {
-		return client.SendText(targetPaneID, expander.Expand(prompt.Contents))
+		return client.InsertPrompt(targetPaneID, expander.Expand(prompt.Contents))
 	}, libraries, loadErr), nil
 }
 
