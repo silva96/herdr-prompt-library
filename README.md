@@ -140,8 +140,7 @@ Create and duplicate forms contain title, multiline prompt, and a Local/Global d
 Insertion uses `herdr pane send-text <pane> <text>` by default. To submit the prompt instead, set `input_command = "agent prompt"` in the plugin config file:
 
 ```sh
-mkdir -p ~/.config/herdr/plugins/config/herdr.prompt-library
-cat > ~/.config/herdr/plugins/config/herdr.prompt-library/config.toml <<'EOF'
+cat > "$(herdr plugin config-dir herdr.prompt-library)/config.toml" <<'EOF'
 input_command = "agent prompt"
 EOF
 ```
