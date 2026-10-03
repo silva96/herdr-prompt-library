@@ -28,9 +28,13 @@ func command(args []string) error {
 			Binary: os.Getenv("HERDR_BIN_PATH"),
 		})
 	case "picker":
+		insertCommand, err := config.LoadInputCommand()
+		if err != nil {
+			return err
+		}
 		return picker(os.Getenv, config.Load, config.ConfiguredLibraries, herdr.Client{
 			Binary:        os.Getenv("HERDR_BIN_PATH"),
-			InsertCommand: os.Getenv(herdr.InsertCommandEnv),
+			InsertCommand: insertCommand,
 		})
 	default:
 		return fmt.Errorf("unknown command %q: %w", args[0], errUsage)

@@ -16,7 +16,6 @@ const (
 	TargetPaneIDEnv  = "HERDR_PROMPT_LIBRARY_TARGET_PANE_ID"
 	ProjectRootEnv   = "HERDR_PROMPT_LIBRARY_PROJECT_ROOT"
 	DirectoryEnv     = "HERDR_PROMPT_LIBRARY_DIRECTORY"
-	InsertCommandEnv = "HERDR_PROMPT_LIBRARY_INSERT_COMMAND"
 	AgentPrompt      = "agent prompt"
 	SendText         = "pane send-text"
 	DefaultBinary    = "herdr"
@@ -47,7 +46,7 @@ func (c Client) InsertPrompt(targetPaneID, text string) error {
 
 	command := c.InsertCommand
 	if command == "" {
-		command = AgentPrompt
+		command = SendText
 	}
 	var args []string
 	switch command {

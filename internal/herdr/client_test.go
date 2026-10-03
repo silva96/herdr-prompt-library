@@ -67,7 +67,7 @@ func TestOpenPickerReturnsRunnerError(t *testing.T) {
 	}
 }
 
-func TestInsertPromptPreservesExactArgumentAndSubmitsByDefault(t *testing.T) {
+func TestInsertPromptPreservesExactArgumentWithoutSubmittingByDefault(t *testing.T) {
 	var gotName string
 	var gotArgs, gotEnv []string
 	client := Client{
@@ -87,7 +87,7 @@ func TestInsertPromptPreservesExactArgumentAndSubmitsByDefault(t *testing.T) {
 	if gotName != client.Binary {
 		t.Errorf("command name = %q, want %q", gotName, client.Binary)
 	}
-	wantArgs := []string{"agent", "prompt", "pane; $(not-a-command)", text}
+	wantArgs := []string{"pane", "send-text", "pane; $(not-a-command)", text}
 	if !reflect.DeepEqual(gotArgs, wantArgs) {
 		t.Errorf("arguments = %#v, want %#v", gotArgs, wantArgs)
 	}
@@ -96,10 +96,10 @@ func TestInsertPromptPreservesExactArgumentAndSubmitsByDefault(t *testing.T) {
 	}
 }
 
-func TestInsertPromptCanUseConfiguredSendTextCommand(t *testing.T) {
+func TestInsertPromptCanUseConfiguredAgentPromptCommand(t *testing.T) {
 	var gotArgs []string
 	client := Client{
-		InsertCommand: SendText,
+		InsertCommand: AgentPrompt,
 		Run: func(_ string, args []string, _ []string) error {
 			gotArgs = args
 			return nil
@@ -108,7 +108,7 @@ func TestInsertPromptCanUseConfiguredSendTextCommand(t *testing.T) {
 	if err := client.InsertPrompt("pane-1", "text"); err != nil {
 		t.Fatalf("InsertPrompt() error = %v", err)
 	}
-	wantArgs := []string{"pane", "send-text", "pane-1", "text"}
+	wantArgs := []string{"agent", "prompt", "pane-1", "text"}
 	if !reflect.DeepEqual(gotArgs, wantArgs) {
 		t.Errorf("arguments = %#v, want %#v", gotArgs, wantArgs)
 	}

@@ -1,6 +1,6 @@
 # Herdr Prompt Library
 
-Prompt Library is a [Herdr](https://herdr.dev) plugin for browsing, managing, and inserting prompts into the pane that was focused when the picker opened. Prompts are Markdown files. Insertion is literal: frontmatter is metadata and only the Markdown body is sent; shell syntax is not executed. By default, insertion uses `herdr agent prompt` and submits the prompt.
+Prompt Library is a [Herdr](https://herdr.dev) plugin for browsing, managing, and inserting prompts into the pane that was focused when the picker opened. Prompts are Markdown files. Insertion is literal: frontmatter is metadata and only the Markdown body is sent; shell syntax is not executed. By default, insertion uses `herdr pane send-text` and does not submit the prompt.
 
 ![Herdr Prompt Library picker](screenshot.png)
 
@@ -137,7 +137,16 @@ Create and duplicate forms contain title, multiline prompt, and a Local/Global d
 
 `Ctrl+S` saves the active form. `Tab` moves between form fields and `Esc` cancels the form or confirmation without inserting or changing files. Saved changes are picked up the next time the library is refreshed or reopened. Insertion sends only the selected Markdown body to the original pane and does not modify the prompt file.
 
-By default, insertion runs `herdr agent prompt <pane> <text>`, which submits the prompt. To keep the prompt in the pane without submitting it, set `HERDR_PROMPT_LIBRARY_INSERT_COMMAND="pane send-text"` in the environment inherited by Herdr. The supported values are `agent prompt` (default) and `pane send-text`.
+Insertion uses `herdr pane send-text <pane> <text>` by default. To submit the prompt instead, set `input_command = "agent prompt"` in the plugin config file:
+
+```sh
+mkdir -p ~/.config/herdr/plugins/config/herdr.prompt-library
+cat > ~/.config/herdr/plugins/config/herdr.prompt-library/config.toml <<'EOF'
+input_command = "agent prompt"
+EOF
+```
+
+The supported values are `pane send-text` (default) and `agent prompt`.
 
 ## Discovery and errors
 
